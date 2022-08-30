@@ -1,0 +1,245 @@
+{
+    "_version": "1.15.0",
+    "sap.app": {
+        "id": "destination.integrationCard2",
+        "type": "card",
+        "title": "Complex Card",
+        "subTitle": "",
+        "applicationVersion": {
+            "version": "1.0.0"
+        }
+    },
+    "sap.ui": {
+        "technology": "UI5",
+        "deviceTypes": {
+            "desktop": true,
+            "phone": true,
+            "tablet": true
+        },
+        "icons": {
+            "icon": "sap-icon://table-view"
+        }
+    },
+    "sap.card": {
+        "type": "List",
+        "extension": "./DataExtension",
+        "designtime": "dt/configuration",
+        "data": {
+            "extension": {
+                "method": "getData"
+            }
+        },
+        "configuration": {
+            "messages": {
+                "noData": {
+                    "type": "NoSearchResults",
+                    "title": "No products found",
+                    "description": "There were no products matching your inquiry",
+                    "size": "Auto"
+                }
+            },
+            "destinations": {
+                "Northwind": {
+                    "defaultUrl": "https://services.odata.org/V4/Northwind/Northwind.svc"
+                }
+            },
+            "parameters": {
+                "selectedSuppliersID": {
+                    "value": 3
+                },
+                "maxItems": {
+                    "value": 3
+                }
+            },
+            "filters": {
+                "supplier": {
+                    "type": "Select",
+                    "label": "Suppliers",
+                    "item": {
+                        "path": "/value",
+                        "template": {
+                            "key": "{SupplierID}",
+                            "title": "{CompanyName}"
+                        }
+                    },
+                    "data": {
+                        "request": {
+                            "url": "{{destinations.Northwind}}/Suppliers"
+                        }
+                    },
+                    "options": [
+                        "date",
+                        "today",
+                        "dateRange",
+                        "from",
+                        "to",
+                        "lastDays",
+                        "nextDays",
+                        "lastWeeks",
+                        "nextWeeks"
+                    ],
+                    "selectedOptions": [],
+                    "value": "{= ${parameters>/selectedSuppliersID/value} ? ${parameters>/selectedSuppliersID/value} : 1"
+                }
+            }
+        },
+        "header": {
+            "title": "{i18n>Products} {= ${filters>/supplier/selectedItem/title} ? ${filters>/supplier/selectedItem/title} : 'All'}",
+            "subTitle": "In Stock Information",
+            "icon": {
+                "src": "sap-icon://product"
+            },
+            "status": {
+                "format": {
+                    "translationKey": "{i18n>CARD.COUNT_X_OF_Y}",
+                    "parts": [
+                        "parameters>/visibleItems",
+                        "/@odata.count"
+                    ]
+                }
+            }
+        },
+        "content": {
+            "hasData": "/value/",
+            "data": {
+                "path": "/value/"
+            },
+            "item": {
+                "title": "{ProductName}",
+                "description": "Unit Price {= format.currency(${UnitPrice}, 'EUR')}",
+                "icon": {
+                    "src": "{{destinations.Northwind}}/Product_{ProductID}.png"
+                },
+                "highlight": "{= ${Highlight} ? 'Success' : 'Warning'}",
+                "actions": [
+                    {
+                        "type": "Navigation",
+                        "parameters": {
+                            "url": "./?ProductID={ProductID}&SupplierID={filters>/supplier/value}"
+                        }
+                    }
+                ],
+                "actionsStrip": [
+                    {
+                        "buttonType": "Transparent",
+                        "text": "Add to Favorites",
+                        "visible": "{isFavVisible}",
+                        "actions": [
+                            {
+                                "type": "Custom",
+                                "parameters": {
+                                    "method": "addToFavorites",
+                                    "id": "{ProductID}"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "buttonType": "Transparent",
+                        "text": "Remove",
+                        "visible": "{isRemove}",
+                        "actions": [
+                            {
+                                "type": "Custom",
+                                "parameters": {
+                                    "method": "remove",
+                                    "id": "{ProductID}"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "footer": {
+            "paginator": {
+                "totalCount": "{/@odata.count}",
+                "pageSize": "{parameters>/maxItems/value}"
+            },
+            "actionsStrip": [
+                {
+                    "text": "Approve",
+                    "overflowPriority": "High",
+                    "buttonType": "Accept",
+                    "actions": [
+                        {
+                            "type": "Custom",
+                            "parameters": {
+                                "method": "approve"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "buttonType": "Reject",
+                    "text": "Reject",
+                    "overflowPriority": "High",
+                    "actions": [
+                        {
+                            "type": "Custom",
+                            "parameters": {
+                                "method": "reject"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "buttonType": "Transparent",
+                    "text": "Details",
+                    "ariaHasPopup": "Dialog",
+                    "actions": [
+                        {
+                            "type": "Custom",
+                            "parameters": {
+                                "method": "openSnack"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "buttonType": "Transparent",
+                    "icon": "sap-icon://email",
+                    "text": "Contact",
+                    "actions": [
+                        {
+                            "type": "Navigation",
+                            "parameters": {
+                                "url": "mailto:{email}"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "buttonType": "Transparent",
+                    "text": "Book a Meeting",
+                    "overflowPriority": "AlwaysOverflow",
+                    "actions": [
+                        {
+                            "type": "Navigation",
+                            "enabled": false,
+                            "parameters": {
+                                "url": "{agendaUrl}"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "buttonType": "Transparent",
+                    "text": "Contact Company",
+                    "overflowPriority": "AlwaysOverflow",
+                    "actions": [
+                        {
+                            "type": "Navigation",
+                            "parameters": {
+                                "url": "mailto:{company/email}?subject={company/emailSubject}"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "sap.platform.mobilecards": {
+        "compatible": false
+    }
+}
